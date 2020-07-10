@@ -6,7 +6,7 @@ from glob import iglob
 from docx import Document
 from docx.shared import Inches
 
-BASE_DIR = r'/home/caden/Downloads/QA_Processed_Groups/EPUB3/'
+BASE_DIR = r'/home/caden/Downloads/onramp_result/'
 
 
 def run_command(command):

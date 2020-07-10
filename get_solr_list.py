@@ -27,7 +27,7 @@ SOLR_FIELDS = ['title',
                  'id'
                  ]
 
-SOLR_PARAMS = {'q': 'num_images:[100 TO *] category:"Mathematics and Statistics" state:5 site:1',
+SOLR_PARAMS = {'q': 'num_images:[0 TO 100] category:"Mathematics and Statistics" state:5 site:1',
                'fl': ','.join(SOLR_FIELDS),
                'rows': SOLR_PAGE_SIZE,
                'wt': 'json'
@@ -54,5 +54,5 @@ while not done:
 for source_format, item_list in solr_results.items():
     print(source_format, str(len(item_list)))
 
-with open('solr_results.json', 'w') as outfile:
+with open('solr_results_under_100.json', 'w') as outfile:
     json.dump(solr_results, outfile, indent=4, sort_keys=True)

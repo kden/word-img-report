@@ -1,10 +1,14 @@
 import logging
 import os
 import json
-import requests
-
+from os.path import dirname
 from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
+import dicttoxml
+import re
+import errno
+from datetime import datetime
+import lxml.etree as ET
 
 
 def fetch_token():
@@ -16,6 +20,67 @@ def fetch_token():
     except Exception as e:
         logger.error("Can't get OAuth2 Token for " + BKS_USERNAME)
         logger.error(str(e))
+
+
+def slugify(value):
+    """
+    Normalizes string, converts to lowercase, removes non-alpha characters,
+    and converts spaces to hyphens.
+    """
+    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+    value = re.sub(r'[\s]+', '_', value)
+    # ...
+    return value
+
+
+def get_filename(result, source_format):
+    if source_format == EPUB2:
+        extension = '.epub'
+    elif source_format == EPUB3:
+        extension = '.epub3'
+    else:
+        extension = '.zip'
+    if exists(result, 'copyright_date'):
+        copyright_date = datetime.fromisoformat(result['copyright_date'].replace('Z', ''))
+        copyright_year = copyright_date.strftime("%Y")
+    else:
+        copyright_year = 'noyear'
+    raw_filename = str(result['isbn']) + '-' + result['title'] + '-' + result['publisher'] + '-' \
+                   + copyright_year + '-' + str(result.get('num_images', -1)) + '-' + result['id']
+    return slugify(raw_filename) + extension
+
+
+def get_dir(result, source_format):
+    output_path = 'output' + os.sep + format_map[source_format] + os.sep \
+                  + get_img_bucket(result.get('num_images', -1)) + os.sep
+    if not os.path.exists(os.path.dirname(output_path)):
+        try:
+            os.makedirs(os.path.dirname(output_path))
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+    return output_path
+
+
+def get_img_bucket(num_images):
+    if num_images == 0:
+        return '0'
+    elif num_images > 0 and num_images <=100:
+        return '1-100'
+    elif num_images > 100 and num_images <=500:
+        return '101-500'
+    elif num_images > 500 and num_images <=1000:
+        return '501-1000'
+    elif num_images > 1000:
+        return '1001-up'
+    else:
+        return 'None'
+
+def exists(record, field_name):
+    """
+    Our definition of whether a field exists in a Python dict
+    """
+    return field_name in record and record[field_name] is not None and record[field_name] != ''
 
 
 logger = logging.getLogger()
@@ -32,7 +97,6 @@ format_map = {
     NIMAS: 'NIMAS',
     DAISY: 'DAISY'
 }
-
 
 solr_results = {
 }
@@ -52,6 +116,7 @@ oauth = OAuth2Session(client=LegacyApplicationClient(client_id=BKS_CLIENT_ID))
 oauth.params = BKS_API_KEY_PARAM
 oauth.headers = BKS_HEADERS
 
+
 fetch_token()
 
 solr_results = {}
@@ -59,36 +124,18 @@ solr_results = {}
 with open('solr_results.json', 'r') as infile:
     solr_results = json.load(infile)
 
-
 for book_format in format_map:
     print(str(book_format))
     format_list = solr_results.get(str(book_format))
     for solr_result in format_list:
         id = solr_result['id']
-        url = BKS_BASE_URL + '/titles/' + id
+        url = BKS_BASE_URL + '/titles/' + id + '/source'
         book_record = {}
         r = oauth.get(url, headers=BKS_HEADERS)
-        bks_result = r.json()
-        book_record['bisacCategories'] = ['MAT000000']
-        book_record['copyrightYear'] = bks_result['copyrightDate']
-        book_record['countries'] = bks_result['countries']
-        book_record['edition'] = bks_result['edition']
-        book_record['englishTitle'] = bks_result['title']
-        book_record['externalCategoryCode'] = bks_result['externalCategoryCode']
-        book_record['isbn'] = bks_result['isbn13']
-        book_record['languages'] = bks_result['languages']
-        book_record['notes'] = bks_result['notes']
-        book_record['onixRecordType'] = 'GENERIC'
-        book_record['publicationDate'] = bks_result['publishDate']
-        book_record['publisherName'] = bks_result['publisher']
-        book_record['readingAgeHigh'] = bks_result['readingAgeMaximum']
-        book_record['readingAgeLow'] = bks_result['readingAgeMinimum']
-        book_record['seriesNumber'] = bks_result['seriesNumber']
-        book_record['seriesTitle'] = bks_result['seriesTitle']
-        book_record['synopsis'] = bks_result['synopsis']
-        book_record['title'] = bks_result['title']
-
-        print(json.dumps(bks_result, indent=4))
-        print(json.dumps(book_record, indent=4))
-
+        r.raise_for_status()
+        outfilename = get_dir(solr_result, book_format) + get_filename(solr_result, book_format)
+        print(outfilename)
+        with open(outfilename, 'wb') as out:
+            out.write(r.content)
         break
+
