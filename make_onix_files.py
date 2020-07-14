@@ -75,8 +75,12 @@ def get_img_bucket(num_images):
         return '101-500'
     elif num_images > 500 and num_images <=1000:
         return '501-1000'
-    elif num_images > 1000:
-        return '1001-up'
+    elif num_images > 1000 and num_images <=5000:
+        return '1001-5000'
+    elif num_images > 5000 and num_images <=10000:
+        return '5001-10000'
+    elif num_images > 10000:
+        return '10001-up'
     else:
         return 'None'
 
@@ -136,7 +140,7 @@ fetch_token()
 
 solr_results = {}
 
-with open('solr_results.json', 'r') as infile:
+with open('solr_results_under_100.json', 'r') as infile:
     solr_results = json.load(infile)
 
 for book_format in format_map:
@@ -200,5 +204,5 @@ for book_format in format_map:
                 with open(outfilename, 'w') as out:
                     out.write(ET.tostring(onix_record, encoding='unicode', pretty_print=True))
         
-with open('solr_results_updated_isbns.json', 'w') as outfile:
+with open('solr_results_under_100_updated_isbns.json', 'w') as outfile:
     json.dump(solr_results, outfile, indent=4, sort_keys=True)
