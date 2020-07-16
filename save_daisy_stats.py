@@ -130,7 +130,7 @@ print("Database opened successfully")
 cursor = con.cursor()
 con.rollback()
 
-with open('solr_results_updated_isbns.json', 'r') as infile:
+with open('solr_results_under_100_updated_isbns.json', 'r') as infile:
     solr_results = json.load(infile)
 
 for book_format in format_map:
