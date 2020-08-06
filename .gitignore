@@ -5,3 +5,14 @@ output
 onix
 daisy
 solr_results*.json
+source
+test
+test_sets
+*.ods
+*.csv
+#*
+*.backup
+athena
+confluence
+exported_data
+
