@@ -1,13 +1,6 @@
 import logging
 import os
 import re
-import errno
-import requests
-import psycopg2
-from bs4 import BeautifulSoup
-import shutil
-import time
-import random
 import csv
 import pytz
 from datetime import datetime, timezone
