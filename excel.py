@@ -1,36 +1,19 @@
 #!/usr/bin/env python
 
+import bz2
+import json
 import os
 import re
+import shutil
 from glob import iglob
 import xlsxwriter
 from PIL import Image
-import shutil
-import bz2
-import json
+
+from pytitle.util import run_command, normalize_file_path, exists
 
 BASE_DIR = '/home/caden/CadenProjects/word-img-report/excel-test'
 
 
-def run_command(command):
-    print(command)
-    return os.system(command + ">/dev/null 2>&1")
-
-
-def normalize_file_path(pathname):
-    path, filename = os.path.split(pathname)
-    filename = filename.lower().replace('-', '_')
-    base = filename[0:-4]
-    extension = filename[-3:]
-    base = base.replace('.', '_')
-    new_pathname = '/'.join([path, '.'.join([base, extension])])
-    return new_pathname
-
-def exists(record, field_name):
-    """
-    Our definition of whether a field exists in a Python dict
-    """
-    return field_name in record and record[field_name] is not None and record[field_name] != ''
 
 # Create Word file
 

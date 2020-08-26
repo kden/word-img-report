@@ -1,78 +1,14 @@
+import json
 import logging
 import os
-import json
 import re
-import errno
-import psycopg2
 
-from datetime import datetime
+import psycopg2
 from psycopg2.extensions import AsIs
 
+from pytitle.fileutil import format_map, get_dir, get_filename_from_solr_result
+from pytitle.util import exists
 
-
-def slugify(value):
-    """
-    Normalizes string, converts to lowercase, removes non-alpha characters,
-    and converts spaces to hyphens.
-    """
-    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    value = re.sub(r'[\s]+', '_', value)
-    # ...
-    return value
-
-
-def get_filename(result):
-    if exists(result, 'copyright_date'):
-        copyright_date = datetime.fromisoformat(result['copyright_date'].replace('Z', ''))
-        copyright_year = copyright_date.strftime("%Y")
-    else:
-        copyright_year = 'noyear'
-    isbn = result.get('isbn', 'noisbn')
-    title = result.get('title', 'notitle')
-    title = title[:100]
-    publisher = result.get('publisher', 'nopublisher')
-    publisher = publisher[:100]
-    raw_filename = isbn + '-' + title + '-' + \
-                   publisher + '-' + copyright_year \
-                   + '-' + str(result.get('num_images', -1)) + '-' + result['id']
-    return slugify(raw_filename) + "-DAISY.xml"
-
-def get_dir(result, source_format):
-    output_path = 'daisy' + os.sep + format_map[source_format] + os.sep \
-                  + get_img_bucket(result.get('num_images', -1)) + os.sep
-    if not os.path.exists(os.path.dirname(output_path)):
-        try:
-            os.makedirs(os.path.dirname(output_path))
-        except OSError as exc:  # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
-    return output_path
-
-
-def get_img_bucket(num_images):
-    print(num_images)
-    if num_images == 0:
-        return '0'
-    elif num_images > 0 and num_images <=100:
-        return '1-100'
-    elif num_images > 100 and num_images <=500:
-        return '101-500'
-    elif num_images > 500 and num_images <=1000:
-        return '501-1000'
-    elif num_images > 1000 and num_images <=5000:
-        return '1001-5000'
-    elif num_images > 5000 and num_images <=10000:
-        return '5001-10000'
-    elif num_images > 10000:
-        return '10001-up'
-    else:
-        return 'None'
-
-def exists(record, field_name):
-    """
-    Our definition of whether a field exists in a Python dict
-    """
-    return field_name in record and record[field_name] is not None and record[field_name] != ''
 
 def copy_rec(source, destination, source_name, dest_name):
     if exists(source, source_name):
@@ -95,21 +31,6 @@ def get_shared(solr_result, source_format):
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-EPUB2 = 11
-EPUB3 = 37
-NIMAS = 8
-DAISY = 3
-
-format_map = {
-    EPUB2: 'EPUB2',
-    EPUB3: 'EPUB3',
-    NIMAS: 'NIMAS',
-    DAISY: 'DAISY'
-}
-
-solr_results = {
-}
 
 img_pattern = re.compile(r'<img([^>]*>)', re.MULTILINE)
 attr_pattern = re.compile(r'(\w+)=[\'"]((\\\'|\\""|[^\'"])*)[\'"]', re.MULTILINE)
@@ -136,7 +57,7 @@ with open('solr_results_under_100_updated_isbns.json', 'r') as infile:
 for book_format in format_map:
     format_list = solr_results.get(str(book_format))
     for solr_result in format_list:
-        dtbookfilename = get_dir(solr_result, book_format) + get_filename(solr_result)
+        dtbookfilename = get_dir(solr_result, book_format) + get_filename_from_solr_result(solr_result,"-DAISY.xml" )
 
         if not os.path.exists(dtbookfilename):
             print("There is no " + dtbookfilename)

@@ -1,29 +1,14 @@
 import logging
 import os
-import json
 import re
-import errno
+
 import psycopg2
-
-from datetime import datetime
 from psycopg2.extensions import AsIs
-
-
-
-def exists(record, field_name):
-    """
-    Our definition of whether a field exists in a Python dict
-    """
-    return field_name in record and record[field_name] is not None and record[field_name] != ''
-
-
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-solr_results = {
-}
-
+solr_results = {}
 
 mathml_pattern = re.compile(r'(<[^>]+?>)([^<>]*?)(<!--[\s]*)?((<[a-z: ]*math[^>]*>).*?</[a-z: ]*math[^>]*>)', re.MULTILINE|re.IGNORECASE)
 

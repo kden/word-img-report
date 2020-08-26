@@ -1,38 +1,15 @@
+import json
 import logging
 import os
-import json
-from os.path import dirname
-from oauthlib.oauth2 import LegacyApplicationClient
-from requests_oauthlib import OAuth2Session
-import dicttoxml
-import re
-import errno
-import csv
 from datetime import datetime
+from os.path import dirname
+
+import dicttoxml
 import lxml.etree as ET
 
-
-def fetch_token():
-    try:
-        token = oauth.fetch_token(token_url=BKS_TOKEN_URL,
-                                  username=BKS_USERNAME, password=BKS_PASSWORD,
-                                  client_id=BKS_CLIENT_ID, client_secret='')
-        return token
-    except Exception as e:
-        logger.error("Can't get OAuth2 Token for " + BKS_USERNAME)
-        logger.error(str(e))
-
-
-def slugify(value):
-    """
-    Normalizes string, converts to lowercase, removes non-alpha characters,
-    and converts spaces to underscores.
-    """
-    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    value = re.sub(r'[\s]+', '_', value)
-    # ...
-    return value
-
+from pytitle.bksapiv2 import fetch_token, BKS_BASE_URL
+from pytitle.fileutil import get_dir, format_map
+from pytitle.util import exists, slugify
 
 def get_onix_filename(result, isbn=None):
     if exists(result, 'copyright_date'):
@@ -53,42 +30,6 @@ def get_onix_filename(result, isbn=None):
                    + '-' + str(result.get('num_images', -1)) + '-' + result['id']
     return slugify(raw_filename) + ".xml"
 
-def get_dir(num_images, source_format):
-    output_path =  'output' + os.sep + format_map[source_format]+ os.sep \
-                   + get_img_bucket(num_images) + os.sep
-    if not os.path.exists(os.path.dirname(output_path)):
-        try:
-            os.makedirs(os.path.dirname(output_path))
-        except OSError as exc:  # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
-    return output_path
-
-
-def get_img_bucket(num_images):
-    print(num_images)
-    if num_images == 0:
-        return '0'
-    elif num_images > 0 and num_images <=100:
-        return '1-100'
-    elif num_images > 100 and num_images <=500:
-        return '101-500'
-    elif num_images > 500 and num_images <=1000:
-        return '501-1000'
-    elif num_images > 1000 and num_images <=5000:
-        return '1001-5000'
-    elif num_images > 5000 and num_images <=10000:
-        return '5001-10000'
-    elif num_images > 10000:
-        return '10001-up'
-    else:
-        return 'None'
-
-def exists(record, field_name):
-    """
-    Our definition of whether a field exists in a Python dict
-    """
-    return field_name in record and record[field_name] is not None and record[field_name] != ''
 
 
 get_child_element = lambda parent: XML_CHILD_MAP.get(parent)
@@ -98,35 +39,8 @@ ONIX_XSL_FILE = 'onixFile20.xsl'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-EPUB2 = 11
-EPUB3 = 37
-NIMAS = 8
-DAISY = 3
-
-format_map = {
-    EPUB2: 'EPUB2',
-    EPUB3: 'EPUB3',
-    NIMAS: 'NIMAS',
-    DAISY: 'DAISY'
-}
-
 solr_results = {
 }
-
-BKS_CLIENT_ID = os.environ.get('V2_API_KEY', 'Missing')
-BKS_USERNAME = os.environ.get('V2_API_USERNAME', 'Missing')
-BKS_PASSWORD = os.environ.get('V2_API_PASSWORD', 'Missing')
-BKS_BASE_URL = os.environ.get('BKS_API_BASE_URL', 'https://api.qa.bookshare.org/v2')
-BKS_TOKEN_URL = os.environ.get('BKS_API_TOKEN_URL', 'https://auth.qa.bookshare.org/oauth/token')
-
-BKS_API_KEY_PARAM = {'api_key': BKS_CLIENT_ID}
-
-X_BOOKSHARE_ORIGIN = os.environ.get('X_BOOKSHARE_ORIGIN', '12345678')
-BKS_HEADERS = {'X-Bookshare-Origin': X_BOOKSHARE_ORIGIN}
-
-oauth = OAuth2Session(client=LegacyApplicationClient(client_id=BKS_CLIENT_ID))
-oauth.params = BKS_API_KEY_PARAM
-oauth.headers = BKS_HEADERS
 
 XML_CHILD_MAP = {
     'bisacCategories': 'bisacCategory',
@@ -136,11 +50,11 @@ XML_CHILD_MAP = {
     'onixRecords': 'onixRecord'
 }
 
-fetch_token()
+(oauth, token) = fetch_token()
 
 solr_results = {}
 
-with open('solr_results_under_100.json', 'r') as infile:
+with open('solr_results_under.json', 'r') as infile:
     solr_results = json.load(infile)
 
 for book_format in format_map:
@@ -154,7 +68,7 @@ for book_format in format_map:
             id = solr_result['id']
             url = BKS_BASE_URL + '/titles/' + id
             book_record = {}
-            r = oauth.get(url, headers=BKS_HEADERS)
+            r = oauth.get(url)
             bks_result = r.json()
             book_record['bisacCategories'] = ['MAT000000']
             if exists(bks_result, 'categories'):
@@ -204,5 +118,5 @@ for book_format in format_map:
                 with open(outfilename, 'w') as out:
                     out.write(ET.tostring(onix_record, encoding='unicode', pretty_print=True))
         
-with open('solr_results_under_100_updated_isbns.json', 'w') as outfile:
+with open('solr_results_updated_isbns.json', 'w') as outfile:
     json.dump(solr_results, outfile, indent=4, sort_keys=True)
