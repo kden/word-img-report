@@ -6,6 +6,8 @@ from glob import iglob
 import xlsxwriter
 from PIL import Image
 import shutil
+import bz2
+import json
 
 BASE_DIR = '/home/caden/CadenProjects/word-img-report/excel-test'
 
@@ -24,6 +26,11 @@ def normalize_file_path(pathname):
     new_pathname = '/'.join([path, '.'.join([base, extension])])
     return new_pathname
 
+def exists(record, field_name):
+    """
+    Our definition of whether a field exists in a Python dict
+    """
+    return field_name in record and record[field_name] is not None and record[field_name] != ''
 
 # Create Word file
 
@@ -34,17 +41,25 @@ title_pattern = re.compile(title_pattern_string)
 # <img src="images/cover.jpg" alt="Illustration" xml:space="preserve" id="img_00000" />
 
 img_pattern = re.compile(r'<img([^>]*)>', re.MULTILINE)
-attr_pattern = re.compile(r'(\w+)=[\'"]((\\\'|\\""|[^\'"])*)[\'"]', re.MULTILINE)
+attr_pattern = re.compile(r'([A-Za-z\-\_]+)=[\'"]((\\\'|\\""|[^\'"])*)[\'"]', re.MULTILINE)
 
 
 # For each DAISY file, unzip file
 for zippath in iglob(BASE_DIR + '/*.zip'):
     path, filename = os.path.split(zippath)
     basename = zippath.replace('.zip', '')
+    json_filename = zippath.replace('.zip', '.json.bz2')
+
+    json_file = bz2.BZ2File(json_filename, "r")
+    img_log_data = {}
+    for img_entry_json in json_file:
+        img_entry = json.loads(img_entry_json)
+        if (exists(img_entry, 'image_src_attribute')):
+            img_log_data[img_entry['image_src_attribute']] = img_entry
+
 
     workbook = xlsxwriter.Workbook(basename + '-report.xlsx')
     worksheet = workbook.add_worksheet()
-    #worksheet.set_default_row(200)
 
     run_command('rm -rf ' + basename)
     run_command('mkdir ' + basename)
@@ -93,6 +108,8 @@ for zippath in iglob(BASE_DIR + '/*.zip'):
                 for attr_match in attr_pattern.finditer(atts):
                     attr_name = attr_match.group(1)
                     attr_value = attr_match.group(2)
+                    print("name= " + attr_name + "value= " + attr_value)
+
                     att_map[attr_name] = attr_value[0:4096]
 
                 img_src = att_map.get('src', "NA")
@@ -102,7 +119,10 @@ for zippath in iglob(BASE_DIR + '/*.zip'):
                     width, height = img.size
                     img.save(tmp_img_path, dpi=(96,96))
                 shutil.move(tmp_img_path, img_path)
-                scale = round(200.0/height, 2)
+                if  height > 200 :
+                    scale = round(200.0/height, 2)
+                else:
+                    scale = 1
                 print('Scale: ' + str(scale) + ' ' + str(width) + ' ' +  str(height) + ' ' + img_src)
                 worksheet.set_row(row, 160)
                 worksheet.insert_image(row, 0, img_path, {'x_scale': scale, 'y_scale': scale})
