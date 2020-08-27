@@ -1,14 +1,13 @@
-import requests
 from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
 import os
 import logging
+import time
 
 
 def fetch_token():
     oauth = OAuth2Session(client=LegacyApplicationClient(client_id=BKS_CLIENT_ID))
     oauth.params = BKS_API_KEY_PARAM
-    oauth.headers = BKS_HEADERS
     try:
         token = oauth.fetch_token(token_url=BKS_TOKEN_URL,
                                   username=BKS_USERNAME, password=BKS_PASSWORD,
@@ -33,7 +32,18 @@ BKS_PAGE_SIZE = 100
 BKS_API_KEY_PARAM = {'api_key': BKS_CLIENT_ID}
 BKS_PARAMS = {'limit': BKS_PAGE_SIZE}
 
+def download_daisy_file(oauth, title_instance_id, zippath):
+    url = BKS_BASE_URL + '/titles/' + title_instance_id + '/DAISY'
+    params = BKS_PARAMS.copy()
+    r = oauth.get(url=url, params=params, allow_redirects=True)
+    while r.status_code == 202:
+        time.sleep(10)
+        r = oauth.get(url=url, params=params, allow_redirects=True)
+        print(str(r.status_code))
 
+    print("daisy file path: " + zippath)
+    with open(zippath, 'wb') as daisy_file:
+        daisy_file.write(r.content)
 
 
 

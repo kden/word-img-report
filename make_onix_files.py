@@ -31,10 +31,8 @@ def get_onix_filename(result, isbn=None):
     return slugify(raw_filename) + ".xml"
 
 
-
 get_child_element = lambda parent: XML_CHILD_MAP.get(parent)
 
-THIS_DIR = dirname(__file__)
 ONIX_XSL_FILE = 'onixFile20.xsl'
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -54,14 +52,14 @@ XML_CHILD_MAP = {
 
 solr_results = {}
 
-with open('solr_results_under.json', 'r') as infile:
+with open('solr_results.json', 'r') as infile:
     solr_results = json.load(infile)
 
 for book_format in format_map:
     format_list = solr_results.get(str(book_format))
     for solr_result in format_list:
         num_images = solr_result.get('num_images', -1)
-        outfilename = get_dir(num_images, book_format) + get_onix_filename(solr_result)
+        outfilename = get_dir('onix', solr_result, book_format) + get_onix_filename(solr_result)
         if os.path.exists(outfilename):
             print("Skipping " + outfilename)
         else:
@@ -95,7 +93,7 @@ for book_format in format_map:
             book_record['synopsis'] = bks_result['synopsis']
             book_record['title'] = bks_result['title']
 
-            outfilename = get_dir(num_images, book_format) + get_onix_filename(solr_result, book_record['isbn'])
+            outfilename = get_dir('onix', solr_result, book_format) + get_onix_filename(solr_result, book_record['isbn'])
             if os.path.exists(outfilename):
                 print("Skipping updated " + outfilename)
             else:

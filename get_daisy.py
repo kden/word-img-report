@@ -7,13 +7,13 @@ from pytitle.fileutil import format_map, get_dir, get_filename_from_solr_result
 
 solr_results = {}
 
-DTBOOK_MIME_TYPE='application/x-dtbook+xml'
+DTBOOK_MIME_TYPE='application/x-dtbook+xml.py'
 
 (oauth, token) = fetch_token()
 
 solr_results = {}
 
-with open('solr_results_under_100_updated_isbns.json', 'r') as infile:
+with open('solr_results_updated_isbns.json', 'r') as infile:
     solr_results = json.load(infile)
 
 for book_format in format_map:

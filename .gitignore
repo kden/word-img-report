@@ -10,9 +10,9 @@ test
 test_sets
 *.ods
 *.csv
-#*
 *.backup
 athena
 confluence
 exported_data
+excel-test
 
