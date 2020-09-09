@@ -1,17 +1,17 @@
+"""
+Attempt a voting scheme to determine whether image alt text should be replaced with
+Math Detective alt text.
+Takes a list of book_id's containing alt texts which don't fit into a well-defined group
+Work in progress: doesn't work well right now.
+"""
+
 import logging
-import os
-from statistics import median, mean
 
 import psycopg2
 from psycopg2.extras import DictCursor
-import re
-import numpy as np
-from sklearn.cluster import AffinityPropagation
-import distance
 
-from pytitle.data import histogram_hash, weight_strings_by_prefix, vote_to_keep
-from pytitle.fileutil import get_dir, get_filename_from_row_result, get_rows_from_file
-from pytitle.util import exists
+from pytitle.data import histogram_hash, vote_to_keep
+from pytitle.fileutil import get_rows_from_file
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

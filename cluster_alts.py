@@ -1,17 +1,20 @@
-import logging
-import os
-from statistics import median, mean
+"""
+Given a list of book_ids for titles that contain images that don't fall into a well-defined
+image group, try to cluster the alt text of the images for that title.
+Repeated patterns are used for non-meaningful subtext (p01a, p01b, p02a, or eqn1233,e qn8323f).
+Maybe this can help us find patterns that can be substituted with new alt text.
+Work in progress: This doesn't work well right now.
+"""
 
+import logging
+import distance
+import numpy as np
 import psycopg2
 from psycopg2.extras import DictCursor
-import re
-import numpy as np
 from sklearn.cluster import AffinityPropagation
-import distance
 
 from pytitle.data import histogram_hash, weight_strings_by_prefix
-from pytitle.fileutil import get_dir, get_filename_from_row_result, get_rows_from_file
-from pytitle.util import exists
+from pytitle.fileutil import get_rows_from_file
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)

@@ -1,3 +1,7 @@
+"""
+Given a list of title instance IDs, attempt to download them from S3.
+This does not currently work because we do not have read access to these source files.
+"""
 import csv
 import logging
 import os

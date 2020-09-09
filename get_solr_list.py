@@ -1,3 +1,6 @@
+"""
+Retrieve a list of titles from Solr and save as a JSON file.
+"""
 import json
 import logging
 

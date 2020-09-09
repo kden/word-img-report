@@ -1,3 +1,7 @@
+"""
+Update previously created records in the img alt text database with the submitted and index last updated dates.
+"""
+
 import csv
 import json
 import logging

@@ -1,3 +1,7 @@
+"""
+Given a json file containing Solr search results,
+connect to the Bookshare V2 API and create ONIX metadata files from the results.
+"""
 import json
 import logging
 import os
@@ -12,6 +16,12 @@ from pytitle.fileutil import get_dir, format_map
 from pytitle.util import exists, slugify
 
 def get_onix_filename(result, isbn=None):
+    """
+    Create a descriptive filename for the ONIX output file
+    :param result: metadata record
+    :param isbn:
+    :return:
+    """
     if exists(result, 'copyright_date'):
         copyright_date = datetime.fromisoformat(result['copyright_date'].replace('Z', ''))
         copyright_year = copyright_date.strftime("%Y")
@@ -63,6 +73,9 @@ for book_format in format_map:
         if os.path.exists(outfilename):
             print("Skipping " + outfilename)
         else:
+            '''
+            Get the metadata from the Bookshare V2 API
+            '''
             id = solr_result['id']
             url = BKS_BASE_URL + '/titles/' + id
             book_record = {}
@@ -105,6 +118,9 @@ for book_format in format_map:
                         solr_result['isbn'] = book_record['isbn']
                     print(json.dumps(bks_result, indent=4))
                     print(json.dumps(book_record, indent=4))
+                    '''
+                    Convert the title metadata to XML and transform it into ONIX
+                    '''
                     plain_old_xml = dicttoxml.dicttoxml(book_file, attr_type=False, custom_root='onixFile',
                                                         item_func=get_child_element)
                     xml_dom = ET.fromstring(plain_old_xml)
@@ -121,6 +137,8 @@ for book_format in format_map:
                 print("Couldn't retrieve ONIX.  API result:")
                 print(r.text)
 
-        
+'''
+We may have found some corrected ISBNs in the API results, overwrite the old ISBNs with these new ones.
+'''
 with open('solr_results_after_aug_1_updated_isbns.json', 'w') as outfile:
     json.dump(solr_results, outfile, indent=4, sort_keys=True)

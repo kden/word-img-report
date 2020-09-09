@@ -1,3 +1,9 @@
+"""
+Given a JSON file containing the results of a Solr query,
+Extract information about the image references in the corresponding DAISY
+DTBook file and save it to a PostgreSQL database.
+"""
+
 import json
 import logging
 import os
@@ -11,10 +17,25 @@ from pytitle.util import exists
 
 
 def copy_rec(source, destination, source_name, dest_name):
+    """
+    In a null-safe way, copy a field from a source dictionary to a destination dictionary
+    :param source:
+    :param destination:
+    :param source_name:
+    :param dest_name:
+    :return:
+    """
     if exists(source, source_name):
         destination[dest_name] = source[source_name]
 
 def get_shared(solr_result, source_format):
+    """
+    Create a new record from a Solr result record, mapping the Solr
+    fields to fields used in the database
+    :param solr_result:
+    :param source_format:
+    :return:
+    """
     shared = {}
 
     copy_rec(solr_result, shared, 'title', 'title')

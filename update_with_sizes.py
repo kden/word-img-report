@@ -1,3 +1,6 @@
+"""
+Using downloaded source files, update the img alt text database with file sizes for each title.
+"""
 import logging
 import os
 import psycopg2

@@ -1,3 +1,7 @@
+"""
+Using the Bookshare web app scraper/bot, download the source files for a list of titles
+retrieved from the image alt text database.
+"""
 import csv
 import logging
 import os
@@ -7,7 +11,6 @@ import shutil
 import time
 
 import psycopg2
-import requests
 from bs4 import BeautifulSoup
 
 from pytitle.bksbot import get_session, refresh_login, CATALOG_URL

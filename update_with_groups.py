@@ -1,8 +1,10 @@
+"""
+Run SQL statements on the img alt text database that classify the images into several groups
+"""
+
 import logging
-import os
 import psycopg2
 
-from pytitle.fileutil import get_dir, get_filename_from_row_result
 from pytitle.pg import run_update
 
 logger = logging.getLogger()

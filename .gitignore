@@ -5,6 +5,7 @@ solr_results*.json
 *.json.bz2
 *.ods
 *.csv
+*.txt
 *.backup
 archive
 athena

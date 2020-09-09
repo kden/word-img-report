@@ -1,3 +1,7 @@
+"""
+As part of troubleshooting BKS-35753
+Given an AWS Cloudwatch Insights file, create a .csv file with streamlined results.
+"""
 import csv
 import logging
 import os

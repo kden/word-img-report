@@ -1,3 +1,7 @@
+"""
+Given a list of title instance IDs in a file,
+use the webapp scraper/bot to trigger DAISY reprocessing of each file
+"""
 import logging
 
 from pytitle.bksbot import get_session, reprocess_book

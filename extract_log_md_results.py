@@ -1,3 +1,7 @@
+'''
+Given an AWS Cloudwatch Insights log of the format @timestamp,@message,@log,@logStream
+Extract timing data and write to a new .csv file
+'''
 import csv
 import logging
 import os

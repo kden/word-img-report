@@ -1,3 +1,7 @@
+"""
+Given a JSON file containing Solr results,
+using the Bookshare V2 API, download the DTBook file from the DAISY version of each book.
+"""
 import json
 import os
 import requests

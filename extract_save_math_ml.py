@@ -1,3 +1,7 @@
+"""
+Given a list of books in the database known to include MathML and the already-downloaded
+DTBook files for those books, extract the MathML and write to the database.
+"""
 import logging
 import os
 import re

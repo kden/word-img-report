@@ -1,19 +1,13 @@
 #!/usr/bin/env python
-
+"""
+Find some EPUB3 files containing ../ in their img src references.
+This is to validate ticket BKS-36298
+"""
+import os
 import re
 from glob import iglob
-import xlsxwriter
-import os
 
-from botocore.exceptions import ClientError
-
-from pytitle.bksapiv2 import fetch_token, download_daisy_file
-from pytitle.bksbot import get_session, get_artifact_id
-from pytitle.excelutil import insert_img
-from pytitle.fileutil import get_list_from_file, normalize_image_filenames
-from pytitle.s3log import get_artifact_log
-from pytitle.util import run_command, exists, slugify, normalize_file_path
-from pytitle.xml import get_attrs, get_title_from_opf
+from pytitle.util import run_command, exists
 
 BASE_DIR =  './source-exploded'
 print('dir ' + BASE_DIR)
@@ -36,8 +30,7 @@ with open('epub3_list', 'w') as out_file:
         output_dirname = output_basename + '/' + epub3_basename
         extension = epub3_filename[-3:]
         if os.path.exists(output_dirname):
-            #print(output_dirname + " already exists")
-            pass
+            print(output_dirname + " already exists")
         else:
             print("Creating " + output_dirname)
             run_command('mkdir ' + output_dirname)
