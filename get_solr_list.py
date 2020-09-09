@@ -25,10 +25,12 @@ SOLR_FIELDS = ['title',
                  'num_images',
                  'category',
                  'category_bisac',
-                 'id'
+                 'id',
+                 'submit_date'
                  ]
 
-SOLR_PARAMS = {'q': 'num_images:[1 TO *] category:"Mathematics and Statistics" state:5 site:1',
+SOLR_PARAMS = {#'q': 'num_images:[1 TO *] category:"Mathematics and Statistics" state:5 site:1 index_date:[2020-08-01T00:00:00Z TO *]',
+               'q': 'num_images:[1 TO *] category:"Mathematics and Statistics" state:5 site:1',
                'fl': ','.join(SOLR_FIELDS),
                'rows': SOLR_PAGE_SIZE,
                'wt': 'json'
@@ -55,5 +57,5 @@ while not done:
 for source_format, item_list in solr_results.items():
     print(source_format, str(len(item_list)))
 
-with open('solr_results_under.json', 'w') as outfile:
+with open('solr_results_with_dates.json', 'w') as outfile:
     json.dump(solr_results, outfile, indent=4, sort_keys=True)

@@ -18,9 +18,12 @@ psycopg2 = "*"
 beautifulsoup4 = "*"
 pytz = "*"
 boto3 = "*"
-install = "*"
 xlsxwriter = "*"
 pillow = "*"
+xlrd = "*"
+numpy = "*"
+distance = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.8"

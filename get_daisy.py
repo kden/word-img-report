@@ -13,7 +13,7 @@ DTBOOK_MIME_TYPE='application/x-dtbook+xml.py'
 
 solr_results = {}
 
-with open('solr_results_updated_isbns.json', 'r') as infile:
+with open('solr_results_after_aug_1_updated_isbns.json', 'r') as infile:
     solr_results = json.load(infile)
 
 for book_format in format_map:

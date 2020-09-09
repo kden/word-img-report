@@ -99,15 +99,20 @@ def get_img_bucket(num_images):
     else:
         return 'None'
 
+
 def get_list_from_file(filename):
-    result_set = []
+    reprocess_rows = get_rows_from_file(filename)
+    result_set = [int(row[0]) for row in reprocess_rows]
+    return result_set
+
+
+def get_rows_from_file(filename):
+    reprocess_rows = []
     if os.path.exists(filename):
         with open(filename, 'r') as input_file:
             reprocess_rows = list(csv.reader(input_file))
-            print(str(reprocess_rows))
-            result_set = [int(row[0]) for row in reprocess_rows]
-    print("List of title instance ids: " + str(result_set))
-    return result_set
+
+    return reprocess_rows
 
 
 def normalize_image_filenames(basename):

@@ -63,7 +63,7 @@ for title_instance_id in title_instance_id_list:
                 workbook = xlsxwriter.Workbook(workbook_path)
                 worksheet = workbook.add_worksheet()
 
-                headers = ['image', 'image_alt_attribute_before', 'spoken_text', 'ocr_conf', 'math_conf', 'OK', 'comments']
+                headers = ['image', 'image_alt_attribute_before', 'spoken_text', 'ocr_conf', 'math_conf']
                 col = 0
                 worksheet.set_column('A:A', 40)
                 worksheet.set_column('C:C', 40)
@@ -87,6 +87,8 @@ for title_instance_id in title_instance_id_list:
                             atts = match.group(1)
                             att_map = get_attrs(atts)
                             img_src = att_map.get('src', "NA")
+                            if img_src != "NA":
+                                insert_img(row, basename, img_src, worksheet)
                             normalized_src = normalize_file_path(os.path.basename(img_src))
                             if exists(img_log_data, normalized_src):
                                 log_data = img_log_data[normalized_src]
@@ -97,19 +99,11 @@ for title_instance_id in title_instance_id_list:
                                     'ocr_confidence': "No log",
                                     'math_confidence': "No log"
                                 }
-
-                            if exists(log_data, 'ocr_confidence'):
-                                ocr_conf = log_data['ocr_confidence']
-                                if isinstance(ocr_conf, float) \
-                                    and float(log_data['ocr_confidence']) >= 0.9 \
-                                    and float(log_data['ocr_confidence']) <= 0.998:
-                                    if img_src != "NA":
-                                        insert_img(row, basename, img_src, worksheet)
-                                    worksheet.write(row,1, log_data.get('image_alt_attribute_before', "NA"), alt_text_cell_format)
-                                    worksheet.write(row,2, log_data.get('spokentext', "NA"), alt_text_cell_format)
-                                    worksheet.write(row,3, log_data.get('ocr_confidence', "NA"))
-                                    worksheet.write(row,4, log_data.get('math_confidence', "NA"))
-                                    row = row + 1
+                            worksheet.write(row,1, log_data.get('image_alt_attribute_before', "NA"), alt_text_cell_format)
+                            worksheet.write(row,2, log_data.get('spokentext', "NA"), alt_text_cell_format)
+                            worksheet.write(row,3, log_data.get('ocr_confidence', "NA"))
+                            worksheet.write(row,4, log_data.get('math_confidence', "NA"))
+                            row = row + 1
                     workbook.close()
     except OSError as err:
         print("OS error: {0}".format(err))

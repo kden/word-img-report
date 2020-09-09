@@ -63,6 +63,7 @@ def get_latest_history_link(s, title_instance_id, artifact_format):
         print("Alt text was updated.")
     else:
         print("Alt text was not updated.")
+        return None
     source_links = soup.find_all(title='Download title source file',
                                  href=re.compile("artifactFormat=" + artifact_format))
     if source_links:
@@ -71,10 +72,12 @@ def get_latest_history_link(s, title_instance_id, artifact_format):
 
 
 def alt_text_updated(body):
-    return ARTIFACT_ID_PATTERN.search(str(body)) is not None
+    return ADDED_ALT_TEXT_PATTERN.search(str(body)) is not None
 
 
 def get_artifact_id(s, title_instance_id, artifact_format):
     source_link = get_latest_history_link(s, title_instance_id, artifact_format)
-    match = ARTIFACT_ID_PATTERN.search(source_link)
-    return match.group(1)
+    if source_link is not None:
+        match = ARTIFACT_ID_PATTERN.search(source_link)
+        return match.group(1)
+    return None
