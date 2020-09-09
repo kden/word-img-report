@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.cluster import AffinityPropagation
 import distance
 
-from pytitle.data import histogram_hash, weight_strings_by_prefix, vote_to_keep
+from pytitle.data import histogram_hash, weight_strings_by_prefix
 from pytitle.fileutil import get_dir, get_filename_from_row_result, get_rows_from_file
 from pytitle.util import exists
 
@@ -21,7 +21,7 @@ CANDIDATE_TITLE_FILE = 'no_group_titles.csv'
 title_list = get_rows_from_file(CANDIDATE_TITLE_FILE)
 # Remove header row
 title_list.pop(0)
-title_shortlist = [title for title in title_list if 1000 < int(title[0]) < 5000]
+title_shortlist = [title for title in title_list if 1300 < int(title[0]) < 1500]
 print('Number of titles in short list: ' + str(len(title_shortlist)))
 
 con = psycopg2.connect(database="warehouse", user="bookshare", password="", host="127.0.0.1", port="5432",
@@ -38,7 +38,7 @@ for book_row in title_shortlist:
     book_id = book_row[1]
     print("book_id: " + str(book_id))
     img_cursor = con.cursor()
-    img_cursor.execute("select img_id, left(lowercase, 64) as lowercase, length(alt) as len_alt, left(alt, 64) as alt, "
+    img_cursor.execute("select img_id, left(lowercase, 30) as lowercase, length(alt) as len_alt, left(alt, 30) as alt, "
                        + "alt_text_group, title_instance_id, source_format, title_source, title, publisher, "
                        + "copyright_year, isbn from img where alt_text_group ='no group' and book_id=%s", [book_id])
 
@@ -49,11 +49,29 @@ for book_row in title_shortlist:
         for w in sorted(img_hash, key=img_hash.get, reverse=True)[:10]:
             print(str(img_hash[w]) + ': ' + w)
 
-        for w in img_rows:
-            score = vote_to_keep(w['alt'], w['len_alt'])
-            print(w['alt'] + " ==> " + str(score))
+        print("Values, unique values: " + str(len(img_list)) + ', ' + str(len(img_hash.keys())))
+        alt_texts = np.asarray(list(img_hash.keys()))
+        print("Alt texts:")
+        print(alt_texts)
+        preferences = weight_strings_by_prefix(alt_texts)
+        print("Preferences")
+        print(preferences)
+        print("Computing Levenshtein distance")
+        lev_similarity = -1 * np.array([[distance.levenshtein(alt1, alt2) for alt1 in alt_texts] for alt2 in alt_texts])
+        print(lev_similarity)
 
+        print("Computing Affinity Propagation")
 
+        affprop = AffinityPropagation(affinity="precomputed", damping=0.5, preference=preferences)
+        affprop.fit(lev_similarity)
+        for cluster_id in np.unique(affprop.labels_):
+            exemplar = alt_texts[affprop.cluster_centers_indices_[cluster_id]]
+            print("Building cluster for " + exemplar)
+            cluster = np.unique(alt_texts[np.nonzero(affprop.labels_ == cluster_id)])
+            cluster_str = ", ".join(cluster)
+            print(" - *%s:* %s" % (exemplar, cluster_str))
+        break
+        row_count += 1
 
 
 
