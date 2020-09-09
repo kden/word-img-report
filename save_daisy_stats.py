@@ -51,13 +51,13 @@ print("Database opened successfully")
 cursor = con.cursor()
 con.rollback()
 
-with open('solr_results_under_100_updated_isbns.json', 'r') as infile:
+with open('solr_results_after_aug_1_updated_isbns.json', 'r') as infile:
     solr_results = json.load(infile)
 
 for book_format in format_map:
     format_list = solr_results.get(str(book_format))
     for solr_result in format_list:
-        dtbookfilename = get_dir(solr_result, book_format) + get_filename_from_solr_result(solr_result,"-DAISY.xml" )
+        dtbookfilename = get_dir('daisy', solr_result, book_format) + get_filename_from_solr_result(solr_result,"-DAISY.xml" )
 
         if not os.path.exists(dtbookfilename):
             print("There is no " + dtbookfilename)
@@ -101,6 +101,7 @@ for book_format in format_map:
                         img['book_id'] = book_id
                         img['src'] = src_text
                         img['alt'] = alt_text[0:4096]
+                        img['lowercase'] = alt_text[0:256].strip().lower()
                         img['start'] = img_match.start()
                         img_columns = img.keys()
                         img_values = [img[col] for col in img_columns]
