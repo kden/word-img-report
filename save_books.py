@@ -5,16 +5,12 @@ DTBook file and save it to a PostgreSQL database.
 """
 
 import json
-import logging
 
 import psycopg2
 from psycopg2.extensions import AsIs
 
 from pytitle.fileutil import format_map
 from pytitle.util import get_shared, copy_rec
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 
 book_insert = 'insert into book (%s) values %s returning book_id'

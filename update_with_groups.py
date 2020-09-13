@@ -2,13 +2,9 @@
 Run SQL statements on the img alt text database that classify the images into several groups
 """
 
-import logging
 import psycopg2
 
 from pytitle.pg import run_update
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 con = psycopg2.connect(database="warehouse", user="bookshare", password="", host="127.0.0.1", port="5432")
 

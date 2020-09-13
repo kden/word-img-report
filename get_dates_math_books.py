@@ -4,17 +4,15 @@ Update previously created records in the img alt text database with the submitte
 
 import csv
 import json
-import logging
 
 import psycopg2
 from psycopg2.extras import DictCursor
 
 from pytitle.bksapiv2 import fetch_token
 from pytitle.fileutil import format_map
+from pytitle.pg import run_update
 from pytitle.util import exists
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 OUTPUT_FILENAME='books_by_date.csv'
 
@@ -50,8 +48,8 @@ if solr_results:
                 if exists(solr_result, 'submit_date') :
                     sql = "update book set submitted='" + solr_result['submit_date'][0:10] \
                          + "' where title_instance_id=" + solr_result['id']
-                    #run_update(con, sql)
+                    run_update(con, sql)
                 if exists(solr_result, 'latest_change_date') :
                     sql = "update book set last_indexed='" + solr_result['latest_change_date'][0:10] \
                          + "' where title_instance_id=" + solr_result['id']
-                    #run_update(con, sql)
+                    run_update(con, sql)

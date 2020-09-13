@@ -3,12 +3,9 @@ As part of troubleshooting BKS-35753
 Given an AWS Cloudwatch Insights file, create a .csv file with streamlined results.
 """
 import csv
-import logging
 import os
 import re
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 # [02 Jun 2020 03:27:29,697] INFO ContentAcquisitionTask - processing file [org.bookshare.domain.ContentProcessingItem@31fa5038[contentProcessingId=1962017,source=sweetcherryrnib,contentProcessingType=METADATA,contentProcessingStatus=QUEUED,fileName=SweetCherryPublishing20200602103338.xml,fileSize=87798,releaseDate=<null>,sentDate=Tue Jun 02 10:33:00 PDT 2020,titleInstanceId=<null>]]
 log_pattern = re.compile(r'contentProcessingId=([^,]*),source=([^,]*),contentProcessingType=([^,]*),contentProcessingStatus=([^,]*),fileName=([^,]*),fileSize=([^,]*),releaseDate=([^,]*),sentDate=([^,]*),titleInstanceId=([^,\]]*)', re.MULTILINE)

@@ -1,5 +1,6 @@
 import psycopg2
 
+OUTPUT_DATE = "%Y-%m-%d"
 
 def run_update(con, statement):
     cursor = con.cursor()

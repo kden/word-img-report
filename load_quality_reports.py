@@ -1,16 +1,12 @@
 """
 Parse a print-formatted Salesforce page of Book Quality Reports
 """
-import logging
 import re
 from datetime import datetime
 from glob import iglob
 
 import psycopg2
 from psycopg2._psycopg import AsIs
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 input_dir = "salesforce"
 log_entries = []

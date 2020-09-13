@@ -5,7 +5,6 @@ DTBook file and save it to a PostgreSQL database.
 """
 
 import json
-import logging
 import os
 import re
 
@@ -15,8 +14,6 @@ from psycopg2.extensions import AsIs
 from pytitle.fileutil import format_map, get_dir, get_filename_from_solr_result
 from pytitle.util import exists, get_shared, copy_rec
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 img_pattern = re.compile(r'<img([^>]*>)', re.MULTILINE)
 attr_pattern = re.compile(r'(\w+)=[\'"]((\\\'|\\""|[^\'"])*)[\'"]', re.MULTILINE)

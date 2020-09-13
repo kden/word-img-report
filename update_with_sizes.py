@@ -1,14 +1,10 @@
 """
 Using downloaded source files, update the img alt text database with file sizes for each title.
 """
-import logging
 import os
 import psycopg2
 
 from pytitle.fileutil import get_dir, get_filename_from_row_result
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 con = psycopg2.connect(database="warehouse", user="bookshare", password="", host="127.0.0.1", port="5432")
 

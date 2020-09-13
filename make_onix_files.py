@@ -3,10 +3,8 @@ Given a json file containing Solr search results,
 connect to the Bookshare V2 API and create ONIX metadata files from the results.
 """
 import json
-import logging
 import os
 from datetime import datetime
-from os.path import dirname
 
 import dicttoxml
 import lxml.etree as ET
@@ -44,8 +42,6 @@ def get_onix_filename(result, isbn=None):
 get_child_element = lambda parent: XML_CHILD_MAP.get(parent)
 
 ONIX_XSL_FILE = 'onixFile20.xsl'
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 solr_results = {
 }

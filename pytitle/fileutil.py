@@ -21,11 +21,12 @@ format_map = {
     DAISY: 'DAISY'
 }
 
-extension_map = {
+EXTENSION_MAP = {
     'EPUB2': ".epub",
     'EPUB3': ".epub",
     'NIMAS': ".zip",
-    'DAISY': ".zip"
+    'DAISY': ".zip",
+    'RTF':   ".rtf"
 }
 
 

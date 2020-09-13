@@ -5,7 +5,6 @@ Takes a list of book_id's containing alt texts which don't fit into a well-defin
 Work in progress: doesn't work well right now.
 """
 
-import logging
 
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -13,8 +12,6 @@ from psycopg2.extras import DictCursor
 from pytitle.data import histogram_hash, vote_to_keep
 from pytitle.fileutil import get_rows_from_file
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 CANDIDATE_TITLE_FILE = 'no_group_titles.csv'
 

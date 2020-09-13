@@ -3,13 +3,10 @@ Given an AWS Cloudwatch Insights log of the format @timestamp,@message,@log,@log
 Extract timing data and write to a new .csv file
 '''
 import csv
-import logging
 import os
 import re
 from datetime import datetime
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 date_pattern = r'^(\[[^\]]*\])'
 start_title_pattern = re.compile(date_pattern + r'.*Starting reprocessing of titleInstanceId ([\d]*)')

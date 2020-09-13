@@ -4,14 +4,11 @@ using the Bookshare V2 API, download the DTBook file from the DAISY version of e
 """
 import json
 import os
-import requests
 
-from pytitle.bksapiv2 import fetch_token, BKS_BASE_URL, BKS_PARAMS, BKS_PAGE_SIZE
+from pytitle.bksapiv2 import fetch_token, download_dtbook_file
 from pytitle.fileutil import format_map, get_dir, get_filename_from_solr_result
 
 solr_results = {}
-
-DTBOOK_MIME_TYPE='application/x-dtbook+xml.py'
 
 (oauth, token) = fetch_token()
 
@@ -30,46 +27,6 @@ for book_format in format_map:
             print("Skipping " + outfilename)
         else:
             id = solr_result['id']
-            url = BKS_BASE_URL + '/titles/' + id + '/DAISY/resources'
-            bookshare_start = 0
-            next = ""
-            done = False
-            dtbook_resource = {}
-            while not done:
-                params = BKS_PARAMS.copy()
-                print("Page starts with " + str(bookshare_start))
-                params['start'] = next
-                print(url)
-                print(params)
-                r = oauth.get(url=url, params=params)
-                if r.status_code == 200:
-                    results = r.json()
-                    bookshare_start = bookshare_start + BKS_PAGE_SIZE
-                    next = results.get("next", "")
-                    for resource in results['titleFileResources']:
-                        local_uri = resource['localURI']
-                        mime_type = resource['mimeType']
-                        if local_uri.endswith('.xml'):
-                            print(local_uri)
-                            print(mime_type)
-                        if mime_type == DTBOOK_MIME_TYPE:
-                            dtbook_resource = resource
-                            done = True
-                            break
-                else:
-                    print(r.status_code)
-                    print(r.content)
-                done = done or next == "" or bookshare_start >= results['totalResults']
-
-            print(json.dumps(dtbook_resource, indent=2))
-            if dtbook_resource:
-                download_url = dtbook_resource['links'][0]['href']
-                r = requests.get(download_url)
-                r.raise_for_status()
-                print(outfilename)
-                with open(outfilename, 'wb') as out:
-                    out.write(r.content)
-            else:
-                print("Could not find dtbook for " + outfilename)
+            download_dtbook_file(oauth, id, outfilename)
 
 

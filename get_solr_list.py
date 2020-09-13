@@ -2,12 +2,8 @@
 Retrieve a list of titles from Solr and save as a JSON file.
 """
 import json
-import logging
-
 import requests
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 solr_results = {
 }

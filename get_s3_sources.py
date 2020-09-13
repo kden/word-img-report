@@ -3,16 +3,13 @@ Given a list of title instance IDs, attempt to download them from S3.
 This does not currently work because we do not have read access to these source files.
 """
 import csv
-import logging
 import os
 
 import boto3
 import psycopg2
 
-from pytitle.fileutil import get_basename_from_row_result, get_dir, extension_map, make_dir
+from pytitle.fileutil import get_basename_from_row_result, get_dir, EXTENSION_MAP, make_dir
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 con = psycopg2.connect(database="warehouse", user="bookshare", password="", host="127.0.0.1", port="5432")
 
@@ -74,7 +71,7 @@ with open(source_fail_filename, 'a') as fail_file:
 
         source_basename = get_basename_from_row_result(result)
         outdirname = get_dir('source', num_images,source_format) + source_basename
-        outfilename = outdirname + extension_map[source_format]
+        outfilename = outdirname + EXTENSION_MAP[source_format]
 
         if os.path.exists(outfilename):
             print("Skipping already downloaded " + outfilename)

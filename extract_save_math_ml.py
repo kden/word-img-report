@@ -2,15 +2,12 @@
 Given a list of books in the database known to include MathML and the already-downloaded
 DTBook files for those books, extract the MathML and write to the database.
 """
-import logging
 import os
 import re
 
 import psycopg2
 from psycopg2.extensions import AsIs
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 solr_results = {}
 

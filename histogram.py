@@ -4,12 +4,9 @@ create a histogram table counting the number of times each title instance ID app
 Write the table to a file as a JIRA-compatible table.
 """
 import csv
-import logging
 
 from pytitle.util import exists
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 insights_filename = "title_instance_ids.txt"
 insights_outfilename = "histogram.txt"

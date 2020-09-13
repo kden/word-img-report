@@ -6,7 +6,6 @@ Maybe this can help us find patterns that can be substituted with new alt text.
 Work in progress: This doesn't work well right now.
 """
 
-import logging
 import distance
 import numpy as np
 import psycopg2
@@ -16,8 +15,6 @@ from sklearn.cluster import AffinityPropagation
 from pytitle.data import histogram_hash, weight_strings_by_prefix
 from pytitle.fileutil import get_rows_from_file
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 CANDIDATE_TITLE_FILE = 'no_group_titles.csv'
 

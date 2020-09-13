@@ -2,16 +2,11 @@
 Retrieve a list of titles from Solr and save as a JSON file.
 """
 import csv
-import json
-import logging
 import random
 
 import requests
 
 from pytitle.solr import escape_solr_arg
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 OUTPUT_FILENAME = 'timing_results'
 
