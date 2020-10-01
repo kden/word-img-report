@@ -4,10 +4,10 @@ from glob import iglob
 import xlrd
 import xlsxwriter
 
-BASE_DIR =  './manual_review'
+BASE_DIR =  './trial_2'
 print('dir ' + BASE_DIR)
 
-out_path = BASE_DIR + '/manual-histogram.xlsx'
+out_path = 'manual-histogram-trial-2.xlsx'
 with xlsxwriter.Workbook(out_path) as out_book:
     out_sheet = out_book.add_worksheet()
 
