@@ -9,7 +9,7 @@ import time
 
 import psycopg2
 
-from pytitle.bksbot import get_session, refresh_login
+from pytitle.bksbot import get_session, refresh_login, get_source_from_history
 from pytitle.fileutil import get_filename_from_row_result, EXTENSION_MAP, get_dir
 
 con = psycopg2.connect(database="warehouse", user="bookshare", password="", host="127.0.0.1", port="5432")

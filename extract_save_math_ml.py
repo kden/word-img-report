@@ -25,7 +25,8 @@ print("Database opened successfully")
 cursor = con.cursor()
 con.rollback()
 
-cursor.execute("select book_id, filename from book where has_mathml = true")
+cursor.execute("select select book_id, filename, download_count, title_instance_id, source_format, "
+               "title, publisher, copyright_year, isbn from osep_book where source_filename is not null and source_filename <> '' and source_format <> 'RTF'")
 rows = cursor.fetchall()
 
 for row in rows:

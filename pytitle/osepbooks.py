@@ -65,7 +65,7 @@ def get_osep_insert_title(bks_row, download_count):
                     'copyright_year': copyright_date,
                     'submitted': bks_row['publish_date'].strftime(OUTPUT_DATE),
                     'last_indexed': bks_row['latest_change_date'].strftime(OUTPUT_DATE),
-                    'source_format': bks_row['source_artifact_format'],
+                    'source_format': bks_row['source_artifact_format'][0:8],
                     'title_instance_id': bks_row['title_instance_id'],
                     'title_id': bks_row['title_id'],
                     'num_pages': bks_row['num_pages'],
@@ -93,7 +93,6 @@ def osep_insert_categories(bks_cat_cursor, wh_cursor, title_instance_id, title_m
         wh_cursor.execute(osep_cat_insert, (AsIs(','.join(row_columns)), tuple(row_values)))
 
 def get_basename_from_row_result(result):
-    print(result)
     copyright_year = get_value(result, 'copyright_year', 'noyear')
     isbn = get_value(result, 'isbn', 'noisbn')
     title = get_value(result, 'title', 'notitle')

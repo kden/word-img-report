@@ -23,6 +23,7 @@ format_map = {
 
 EXTENSION_MAP = {
     'EPUB2': ".epub",
+    'EPUB':  ".epub",
     'EPUB3': ".epub",
     'NIMAS': ".zip",
     'DAISY': ".zip",

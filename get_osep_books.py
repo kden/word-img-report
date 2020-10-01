@@ -49,9 +49,6 @@ if os.path.exists(in_filename):
                 if result is not None and bks_cursor.rowcount > 0:
                     if bks_cursor.rowcount > 1:
                         print("Warning, " + str(bks_cursor.rowcount) + " results for title_id " + title_id)
-                        delete_sql = "delete from osep_book where title_id="  + title_id
-                        wh_cursor.execute(delete_sql)
-                        print("Deleted " + str(wh_cursor.rowcount))
                     if osep_book_already_loaded(wh_cursor, title_id):
                         print("Book already loaded, " + title_id)
                     else:

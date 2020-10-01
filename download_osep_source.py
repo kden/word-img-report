@@ -31,6 +31,8 @@ row_count = 0
 success_count = 0
 with open(source_fail_filename, 'a') as fail_file:
     for row in rows:
+        if success_count % 20 == 1:
+            s = get_session()
         basename = get_basename_from_row_result(row)
         out_filename =  'osep_books/source/' + basename + EXTENSION_MAP.get(row['source_format'],'.xxx')
 
@@ -45,7 +47,7 @@ with open(source_fail_filename, 'a') as fail_file:
                 byte_size = os.path.getsize(out_filename)
                 print("Size: " + str(byte_size))
 
-                update_size_sql = "update book set size_bytes=" + str(byte_size) + " where title_instance_id=" + str(row['title_instance_id'])
+                update_size_sql = "update osep_book set size_bytes=" + str(byte_size) + " where title_instance_id=" + str(row['title_instance_id'])
                 run_update(con, update_size_sql)
 
                 if row['source_format'] != 'rtf':
